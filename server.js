@@ -83,4 +83,25 @@ api_pedido.get('/order/:numeroPedido', async(request, response) => {
     }
 })
 
+api_pedido.delete('/order/:numeroPedido', async(request, response) => {
+    try {
+        const existingOrder = await prisma.order.findUnique({
+            where: { orderId: request.params.numeroPedido }
+        })
+
+        if (!existingOrder) {
+            return response.status(404).json({ error: 'Pedido não encontrado' })
+        }
+        
+        await prisma.order.delete({
+            where: {
+                orderId: request.params.numeroPedido
+            }
+        })
+        
+        response.status(200).json({ message: 'Pedido deletado com sucesso' })
+    } catch (error) {
+        response.status(500).json({ error: error.message })
+    }
+})
 api_pedido.listen(3000)

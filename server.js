@@ -7,14 +7,14 @@ const users = []
 
 api_pedido.post('/user', (request, response) => {
 
-    console.log(request)
+    users.push(request.body)    
 
     response.send('Cadastrado')
 }
 )
 
 api_pedido.get('/user', (request, response) => {
-    return response.send({message: 'ok'})
+    response.json(users)
 })
 
 api_pedido.listen(3000)

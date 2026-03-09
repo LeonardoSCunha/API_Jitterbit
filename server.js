@@ -92,7 +92,9 @@ api_pedido.delete('/order/:numeroPedido', async(request, response) => {
         if (!existingOrder) {
             return response.status(404).json({ error: 'Pedido não encontrado' })
         }
-        
+        await prisma.item.deleteMany({
+            where: { orderId: existingOrder.id }
+        })
         await prisma.order.delete({
             where: {
                 orderId: request.params.numeroPedido

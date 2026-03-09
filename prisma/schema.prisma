@@ -14,7 +14,13 @@ datasource db {
 }
 
 model Order {
-  OrderId String @id @default(auto()) @map("_id") @db.ObjectId
+  Id String @id @default(auto()) @map("_id") @db.ObjectId
+  OrderId String @unique
   Value Float
   creationDate DateTime
+}
+
+model Item{
+  Id String @id @default(auto()) @map("_id") @db.ObjectId
+  OrderId String @db.ObjectId
 }

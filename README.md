@@ -50,6 +50,10 @@ API REST desenvolvida em Node.js com Express e Prisma para gerenciar pedidos.
 # Instalar dependências
 npm install
 
+# Configurar variáveis de ambiente
+# Crie um arquivo .env na raiz do projeto com:
+# DATABASE_URL="sua_url_do_mongodb_aqui"
+
 # Configurar banco de dados
 npx prisma generate
 npx prisma db push

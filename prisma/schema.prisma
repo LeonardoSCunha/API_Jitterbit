@@ -21,6 +21,11 @@ model Order {
 }
 
 model Item{
+  
   Id String @id @default(auto()) @map("_id") @db.ObjectId
   OrderId String @db.ObjectId
+    order Order @relation(fields: [orderId], references: [id])
+  productId Int
+  quantity Int
+  price Float
 }

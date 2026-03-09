@@ -31,25 +31,24 @@ api_pedido.post('/order', async (request, response) => {
 
 api_pedido.put('/order/:orderId', async (request, response) => {
     try {
+        const existingOrder = await prisma.order.findUnique({
+    where: { orderId: request.params.orderId }
+})
+
+if (!existingOrder) {
+    return response.status(404).json({ error: 'Pedido não encontrado' })
+}
         const order = await prisma.order.update({
             where: {
-                orderId: request.body.orderId
+                orderId: request.params.orderId
             },
             data: {
-                orderId: request.body.orderId,
                 value: request.body.value,
                 creationDate: request.body.creationDate ? new Date(request.body.creationDate) : new Date(),
-                items: {
-                    create: request.body.items.map(item => ({
-                        productId: item.productId,
-                        quantity: item.quantity,
-                        price: item.price
-                    }))
-                }
             },
             include: { items: true } 
         })
-        response.status(201).json(order)
+        response.status(200).json(order)
     } catch (error) {
         response.status(500).json({ error: error.message })
     }

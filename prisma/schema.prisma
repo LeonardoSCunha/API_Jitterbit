@@ -14,17 +14,17 @@ datasource db {
 }
 
 model Order {
-  Id String @id @default(auto()) @map("_id") @db.ObjectId
-  OrderId String @unique
-  Value Float
-  creationDate DateTime
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  orderId String @unique
+  value Float
+  creationDate DateTime @default(now())
+  items Item[]
 }
 
-model Item{
-  
-  Id String @id @default(auto()) @map("_id") @db.ObjectId
-  OrderId String @db.ObjectId
-    order Order @relation(fields: [orderId], references: [id])
+model Item {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+  orderId String @db.ObjectId
+  order Order @relation(fields: [orderId], references: [id])
   productId Int
   quantity Int
   price Float

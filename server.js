@@ -5,6 +5,8 @@ const prisma = new PrismaClient()
 const api_pedido = express()
 api_pedido.use(express.json())
 
+// Endpoint para criar um novo pedido
+// Recebe orderId, value, creationDate e items no body
 api_pedido.post('/order', async (request, response) => {
     try {
         const order = await prisma.order.create({
@@ -29,15 +31,20 @@ api_pedido.post('/order', async (request, response) => {
 }
 )
 
+// Endpoint para atualizar um pedido existente
+// Recebe orderId como parâmetro na URL
 api_pedido.put('/order/:orderId', async (request, response) => {
     try {
+        // Verifica se o pedido existe
         const existingOrder = await prisma.order.findUnique({
-    where: { orderId: request.params.orderId }
-})
+            where: { orderId: request.params.orderId }
+        })
 
-if (!existingOrder) {
-    return response.status(404).json({ error: 'Pedido não encontrado' })
-}
+        if (!existingOrder) {
+            return response.status(404).json({ error: 'Pedido não encontrado' })
+        }
+        
+        // Atualiza o pedido
         const order = await prisma.order.update({
             where: {
                 orderId: request.params.orderId
@@ -55,15 +62,19 @@ if (!existingOrder) {
 }
 )
 
+// Endpoint para listar todos os pedidos
 api_pedido.get('/order/list', async(request, response) => {
     try {
-        const orders = await prisma.order.findMany()
+        const orders = await prisma.order.findMany({
+            include: { items: true }
+        })
         response.status(200).json(orders)
     } catch (error) {
         response.status(500).json({ error: error.message })
     }
 })
 
+// Endpoint para obter um pedido específico pelo número
 api_pedido.get('/order/:numeroPedido', async(request, response) => {
     try {
         const orders = await prisma.order.findUnique({
@@ -83,8 +94,11 @@ api_pedido.get('/order/:numeroPedido', async(request, response) => {
     }
 })
 
+// Endpoint para deletar um pedido
+// Deleta os items relacionados antes de deletar o pedido
 api_pedido.delete('/order/:numeroPedido', async(request, response) => {
     try {
+        // Verifica se o pedido existe
         const existingOrder = await prisma.order.findUnique({
             where: { orderId: request.params.numeroPedido }
         })
@@ -92,9 +106,13 @@ api_pedido.delete('/order/:numeroPedido', async(request, response) => {
         if (!existingOrder) {
             return response.status(404).json({ error: 'Pedido não encontrado' })
         }
+        
+        // Deleta os items relacionados primeiro
         await prisma.item.deleteMany({
             where: { orderId: existingOrder.id }
         })
+        
+        // Deleta o pedido
         await prisma.order.delete({
             where: {
                 orderId: request.params.numeroPedido
@@ -106,4 +124,5 @@ api_pedido.delete('/order/:numeroPedido', async(request, response) => {
         response.status(500).json({ error: error.message })
     }
 })
+
 api_pedido.listen(3000)

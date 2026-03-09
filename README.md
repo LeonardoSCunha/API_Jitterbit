@@ -16,6 +16,7 @@ API REST desenvolvida em Node.js com Express e Prisma para gerenciar pedidos.
 - **GET** `/order/:numeroPedido` - Obter pedido específico por número
 - **GET** `/order/list` - Listar todos os pedidos
 - **PUT** `/order/:orderId` - Atualizar pedido existente
+- **DELETE** `/order/:numeroPedido` - Deletar pedido
 
 ## Estrutura de Dados
 

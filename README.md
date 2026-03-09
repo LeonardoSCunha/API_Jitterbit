@@ -11,13 +11,9 @@ API REST desenvolvida em Node.js com Express e Prisma para gerenciar pedidos.
 
 ## Endpoints Implementados
 
-### ✅ Obrigatórios
 
 - **POST** `/order` - Criar novo pedido
 - **GET** `/order/:numeroPedido` - Obter pedido específico por número
-
-### ✅ Opcionais
-
 - **GET** `/order/list` - Listar todos os pedidos
 - **PUT** `/order/:orderId` - Atualizar pedido existente
 
@@ -41,12 +37,12 @@ API REST desenvolvida em Node.js com Express e Prisma para gerenciar pedidos.
 
 ## Funcionalidades Implementadas
 
-✅ CRUD completo de pedidos  
-✅ Relacionamento entre Order e Items  
-✅ Tratamento de erros robusto com try/catch  
-✅ Validação de pedidos não encontrados (404)  
-✅ Status HTTP adequados (200, 201, 404, 500)  
-✅ Data de criação automática com @default(now())  
+ - CRUD completo de pedidos  
+ - Relacionamento entre Order e Items  
+ - Tratamento de erros robusto com try/catch  
+ - Validação de pedidos não encontrados (404)  
+ - Status HTTP adequados (200, 201, 404, 500)  
+ - Data de criação automática com @default(now())  
 
 ## Como Executar
 

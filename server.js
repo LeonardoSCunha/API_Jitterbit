@@ -5,8 +5,6 @@ const prisma = new PrismaClient()
 const api_pedido = express()
 api_pedido.use(express.json())
 
-const orders = []
-
 api_pedido.post('/order', async (request, response) => {
 
  const order = await prisma.order.create({
@@ -31,6 +29,18 @@ api_pedido.post('/order', async (request, response) => {
 api_pedido.get('/order/list', async(request, response) => {
 
     const orders = await prisma.order.findMany()
+
+    response.status(200).json(orders)
+})
+
+api_pedido.get('/order/prod/:productId', async(request, response) => {
+
+    const orders = await prisma.order.findUnique({
+        where: {
+            orderId: request.params.productId
+        }
+        include: { items: true }
+    })
 
     response.status(200).json(orders)
 })

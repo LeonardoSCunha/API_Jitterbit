@@ -10,11 +10,12 @@ api_pedido.post('/user', (request, response) => {
     users.push(request.body)    
 
     response.send('Cadastrado')
+    responses.status(201).json(request.body)
 }
 )
 
 api_pedido.get('/user', (request, response) => {
-    response.json(users)
+    response.status(200).json(users)
 })
 
 api_pedido.listen(3000)

@@ -9,11 +9,20 @@ const orders = []
 
 api_pedido.post('/order', async (request, response) => {
 
- await prisma.order.create({
+ const order = await prisma.order.create({
         data: {
-            Value: request.body.Value,
-            creationDate: request.body.creationDate
-        } 
+            orderId: request.body.orderId,
+                value: request.body.value,
+                creationDate: request.body.creationDate ? new Date(request.body.creationDate) : new Date(),
+                items: {
+                    create: request.body.items.map(item => ({
+                        productId: item.productId,
+                        quantity: item.quantity,
+                        price: item.price
+                    }))
+                }
+        },
+        include: { items: true } 
     })
     response.status(201).json(request.body)
 }

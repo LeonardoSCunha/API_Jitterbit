@@ -24,11 +24,11 @@ api_pedido.post('/order', async (request, response) => {
         },
         include: { items: true } 
     })
-    response.status(201).json(request.body)
+    response.status(201).json(request.order)
 }
 )
 
-api_pedido.get('/order', async(request, response) => {
+api_pedido.get('/order/list', async(request, response) => {
 
     const orders = await prisma.order.findMany()
 

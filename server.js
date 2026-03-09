@@ -7,20 +7,19 @@ api_pedido.use(express.json())
 
 const users = []
 
-api_pedido.post('/user', (request, response) => {
+api_pedido.post('/order', async (request, response) => {
 
-    prisma.order.create({
+ await prisma.order.create({
         data: {
-            OrderId: request.body.OrderId,
             Value: request.body.Value,
             creationDate: request.body.creationDate
         } 
     })
-    responses.status(201).json(request.body)
+    response.status(201).json(request.body)
 }
 )
 
-api_pedido.get('/user', (request, response) => {
+api_pedido.get('/order', (request, response) => {
     response.status(200).json(users)
 })
 

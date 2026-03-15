@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gerenciador de Pedidos</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+
+    /* NAVBAR */
+    nav {
+      background: #1e293b;
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid #334155;
+      position: sticky; top: 0; z-index: 100;
+    }
+    nav .brand { font-size: 1.2rem; font-weight: 700; color: #38bdf8; letter-spacing: 1px; }
+    nav .links { display: flex; gap: 20px; align-items: center; }
+    nav .links a {
+      display: flex; align-items: center; gap: 6px;
+      color: #94a3b8; text-decoration: none; font-size: 0.85rem;
+      transition: color 0.2s;
+    }
+    nav .links a:hover { color: #38bdf8; }
+    nav .links a img { width: 20px; height: 20px; border-radius: 4px; }
+
+    /* MAIN */
+    main { max-width: 780px; margin: 40px auto; padding: 0 20px; }
+    h1 { font-size: 1.6rem; color: #38bdf8; margin-bottom: 28px; text-align: center; }
+
+    /* CARD */
+    .card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 28px;
+    }
+    .card h2 { font-size: 1rem; color: #7dd3fc; margin-bottom: 18px; text-transform: uppercase; letter-spacing: 1px; }
+
+    /* OPERATION SELECTOR */
+    .op-selector { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 22px; }
+    .op-btn {
+      padding: 8px 18px; border-radius: 8px; border: 1px solid #334155;
+      background: #0f172a; color: #94a3b8; cursor: pointer; font-size: 0.85rem;
+      transition: all 0.2s;
+    }
+    .op-btn:hover { border-color: #38bdf8; color: #38bdf8; }
+    .op-btn.active { background: #38bdf8; color: #0f172a; border-color: #38bdf8; font-weight: 600; }
+
+    /* FORM */
+    .form-group { margin-bottom: 14px; }
+    label { display: block; font-size: 0.8rem; color: #94a3b8; margin-bottom: 5px; }
+    input, textarea {
+      width: 100%; padding: 10px 12px; border-radius: 8px;
+      border: 1px solid #334155; background: #0f172a; color: #e2e8f0;
+      font-size: 0.9rem; outline: none; transition: border 0.2s;
+    }
+    input:focus, textarea:focus { border-color: #38bdf8; }
+    textarea { resize: vertical; min-height: 90px; font-family: monospace; font-size: 0.82rem; }
+
+    .btn-submit {
+      width: 100%; padding: 12px; border-radius: 8px; border: none;
+      background: #38bdf8; color: #0f172a; font-size: 1rem; font-weight: 700;
+      cursor: pointer; transition: background 0.2s; margin-top: 6px;
+    }
+    .btn-submit:hover { background: #7dd3fc; }
+
+    /* RESPONSE */
+    .response-box {
+      background: #0f172a; border: 1px solid #334155; border-radius: 8px;
+      padding: 14px; font-family: monospace; font-size: 0.82rem;
+      white-space: pre-wrap; word-break: break-all; max-height: 320px;
+      overflow-y: auto; color: #a3e635; min-height: 50px;
+    }
+    .response-box.error { color: #f87171; }
+
+    /* LIST */
+    #orderList { display: flex; flex-direction: column; gap: 12px; }
+    .order-item {
+      background: #0f172a; border: 1px solid #334155; border-radius: 8px;
+      padding: 14px; font-size: 0.85rem;
+    }
+    .order-item strong { color: #38bdf8; }
+    .order-item .meta { color: #64748b; font-size: 0.78rem; margin-top: 4px; }
+
+    .hidden { display: none; }
+    .row { display: flex; gap: 12px; }
+    .row .form-group { flex: 1; }
+
+    /* ITEMS BUILDER */
+    .item-row { display: flex; gap: 8px; margin-bottom: 8px; align-items: flex-end; }
+    .item-row input { flex: 1; }
+    .btn-icon {
+      padding: 10px 12px; border-radius: 8px; border: 1px solid #334155;
+      background: #0f172a; color: #f87171; cursor: pointer; font-size: 1rem;
+      transition: all 0.2s;
+    }
+    .btn-icon:hover { border-color: #f87171; }
+    .btn-add {
+      padding: 8px 14px; border-radius: 8px; border: 1px dashed #334155;
+      background: transparent; color: #38bdf8; cursor: pointer; font-size: 0.82rem;
+      margin-bottom: 14px; transition: all 0.2s;
+    }
+    .btn-add:hover { border-color: #38bdf8; }
+  </style>
+</head>
+<body>
+
+<nav>
+  <span class="brand">📦 Order Manager</span>
+  <div class="links">
+    <a href="https://www.linkedin.com" target="_blank">
+      <img src="https://cdn.simpleicons.org/linkedin/0A66C2" alt="LinkedIn"/> LinkedIn
+    </a>
+    <a href="https://www.github.com" target="_blank">
+      <img src="https://cdn.simpleicons.org/github/ffffff" alt="GitHub"/> GitHub
+    </a>
+    <a href="https://www.workana.com" target="_blank">
+      <img src="https://cdn.simpleicons.org/workana/00C853" alt="Workana"/> Workana
+    </a>
+    <a href="https://www.99freelas.com.br" target="_blank">
+      <img src="https://www.99freelas.com.br/favicon.ico" alt="99Freelas"/> 99Freelas
+    </a>
+  </div>
+</nav>
+
+<main>
+  <h1>Gerenciador de Pedidos</h1>
+
+  <!-- OPERATION CARD -->
+  <div class="card">
+    <h2>Operação</h2>
+    <div class="op-selector">
+      <button class="op-btn active" onclick="setOp('create')">➕ Criar</button>
+      <button class="op-btn" onclick="setOp('get')">🔍 Buscar</button>
+      <button class="op-btn" onclick="setOp('update')">✏️ Atualizar</button>
+      <button class="op-btn" onclick="setOp('delete')">🗑️ Deletar</button>
+      <button class="op-btn" onclick="setOp('list')">📋 Listar Todos</button>
+    </div>
+
+    <!-- CREATE -->
+    <div id="form-create">
+      <div class="row">
+        <div class="form-group">
+          <label>Order ID</label>
+          <input id="c-orderId" placeholder="ex: v10089015vdb-01"/>
+        </div>
+        <div class="form-group">
+          <label>Valor (R$)</label>
+          <input id="c-value" type="number" placeholder="10000"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Data de Criação (opcional)</label>
+        <input id="c-date" type="datetime-local"/>
+      </div>
+      <label style="margin-bottom:8px;display:block;font-size:0.8rem;color:#94a3b8;">Itens</label>
+      <div id="items-container"></div>
+      <button class="btn-add" onclick="addItem()">+ Adicionar Item</button>
+      <button class="btn-submit" onclick="createOrder()">Criar Pedido</button>
+    </div>
+
+    <!-- GET -->
+    <div id="form-get" class="hidden">
+      <div class="form-group">
+        <label>Número do Pedido (orderId)</label>
+        <input id="g-orderId" placeholder="ex: v10089015vdb-01"/>
+      </div>
+      <button class="btn-submit" onclick="getOrder()">Buscar Pedido</button>
+    </div>
+
+    <!-- UPDATE -->
+    <div id="form-update" class="hidden">
+      <div class="form-group">
+        <label>Order ID (para localizar)</label>
+        <input id="u-orderId" placeholder="ex: v10089015vdb-01"/>
+      </div>
+      <div class="row">
+        <div class="form-group">
+          <label>Novo Valor (R$)</label>
+          <input id="u-value" type="number" placeholder="15000"/>
+        </div>
+        <div class="form-group">
+          <label>Nova Data (opcional)</label>
+          <input id="u-date" type="datetime-local"/>
+        </div>
+      </div>
+      <button class="btn-submit" onclick="updateOrder()">Atualizar Pedido</button>
+    </div>
+
+    <!-- DELETE -->
+    <div id="form-delete" class="hidden">
+      <div class="form-group">
+        <label>Número do Pedido (orderId)</label>
+        <input id="d-orderId" placeholder="ex: v10089015vdb-01"/>
+      </div>
+      <button class="btn-submit" style="background:#f87171;" onclick="deleteOrder()">Deletar Pedido</button>
+    </div>
+
+    <!-- LIST (no form needed) -->
+    <div id="form-list" class="hidden">
+      <button class="btn-submit" onclick="listOrders()">Carregar Todos os Pedidos</button>
+    </div>
+  </div>
+
+  <!-- RESPONSE CARD -->
+  <div class="card">
+    <h2>Resposta da API</h2>
+    <div id="response" class="response-box">Aguardando operação...</div>
+  </div>
+
+  <!-- LIST RESULTS -->
+  <div id="list-card" class="card hidden">
+    <h2>Pedidos</h2>
+    <div id="orderList"></div>
+  </div>
+</main>
+
+<script>
+  const API = 'https://SUA-URL-RAILWAY.railway.app'; // substitua pela URL gerada no Railway
+  let currentOp = 'create';
+
+  const forms = ['create','get','update','delete','list'];
+
+  function setOp(op) {
+    currentOp = op;
+    forms.forEach(f => document.getElementById('form-' + f).classList.add('hidden'));
+    document.getElementById('form-' + op).classList.remove('hidden');
+    document.querySelectorAll('.op-btn').forEach((b, i) => {
+      b.classList.toggle('active', forms[i] === op);
+    });
+    document.getElementById('list-card').classList.add('hidden');
+    showResponse('Aguardando operação...');
+  }
+
+  function showResponse(data, isError = false) {
+    const el = document.getElementById('response');
+    el.className = 'response-box' + (isError ? ' error' : '');
+    el.textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+  }
+
+  async function request(method, url, body) {
+    try {
+      const opts = { method, headers: { 'Content-Type': 'application/json' } };
+      if (body) opts.body = JSON.stringify(body);
+      const res = await fetch(API + url, opts);
+      const json = await res.json();
+      showResponse(json, !res.ok);
+      return { ok: res.ok, data: json };
+    } catch (e) {
+      showResponse('Erro: ' + e.message, true);
+    }
+  }
+
+  // Items builder
+  let itemCount = 0;
+  function addItem() {
+    const id = itemCount++;
+    const div = document.createElement('div');
+    div.className = 'item-row';
+    div.id = 'item-' + id;
+    div.innerHTML = `
+      <input placeholder="productId (número)" id="ip-${id}" type="number"/>
+      <input placeholder="quantity" id="iq-${id}" type="number"/>
+      <input placeholder="price (R$)" id="ipr-${id}" type="number"/>
+      <button class="btn-icon" onclick="document.getElementById('item-${id}').remove()">✕</button>
+    `;
+    document.getElementById('items-container').appendChild(div);
+  }
+
+  function getItems() {
+    const rows = document.querySelectorAll('#items-container .item-row');
+    return Array.from(rows).map(row => {
+      const id = row.id.split('-')[1];
+      return {
+        productId: parseInt(document.getElementById('ip-' + id).value),
+        quantity: parseInt(document.getElementById('iq-' + id).value),
+        price: parseFloat(document.getElementById('ipr-' + id).value)
+      };
+    });
+  }
+
+  async function createOrder() {
+    const orderId = document.getElementById('c-orderId').value.trim();
+    const value = parseFloat(document.getElementById('c-value').value);
+    const date = document.getElementById('c-date').value;
+    const items = getItems();
+    if (!orderId || isNaN(value) || items.length === 0)
+      return showResponse('Preencha orderId, valor e ao menos 1 item.', true);
+    const body = { orderId, value, items };
+    if (date) body.creationDate = new Date(date).toISOString();
+    await request('POST', '/order', body);
+  }
+
+  async function getOrder() {
+    const id = document.getElementById('g-orderId').value.trim();
+    if (!id) return showResponse('Informe o orderId.', true);
+    await request('GET', '/order/' + id);
+  }
+
+  async function updateOrder() {
+    const id = document.getElementById('u-orderId').value.trim();
+    const value = parseFloat(document.getElementById('u-value').value);
+    const date = document.getElementById('u-date').value;
+    if (!id || isNaN(value)) return showResponse('Informe orderId e novo valor.', true);
+    const body = { value };
+    if (date) body.creationDate = new Date(date).toISOString();
+    await request('PUT', '/order/' + id, body);
+  }
+
+  async function deleteOrder() {
+    const id = document.getElementById('d-orderId').value.trim();
+    if (!id) return showResponse('Informe o orderId.', true);
+    await request('DELETE', '/order/' + id);
+  }
+
+  async function listOrders() {
+    const res = await request('GET', '/order/list');
+    if (!res?.ok) return;
+    const listCard = document.getElementById('list-card');
+    const listEl = document.getElementById('orderList');
+    listEl.innerHTML = '';
+    if (!res.data.length) { listEl.innerHTML = '<p style="color:#64748b">Nenhum pedido encontrado.</p>'; }
+    res.data.forEach(o => {
+      const div = document.createElement('div');
+      div.className = 'order-item';
+      div.innerHTML = `
+        <strong>${o.orderId}</strong> — R$ ${o.value?.toLocaleString('pt-BR')}
+        <div class="meta">
+          ${o.items?.length || 0} item(s) &nbsp;|&nbsp;
+          ${o.creationDate ? new Date(o.creationDate).toLocaleString('pt-BR') : '—'}
+        </div>
+      `;
+      listEl.appendChild(div);
+    });
+    listCard.classList.remove('hidden');
+  }
+
+  // Init with one item row
+  addItem();
+</script>
+</body>
+</html>

@@ -80,13 +80,31 @@
     .response-box.error { color: #f87171; }
 
     /* LIST */
-    #orderList { display: flex; flex-direction: column; gap: 12px; }
+    #orderList { display: flex; flex-direction: column; gap: 10px; }
     .order-item {
       background: #0f172a; border: 1px solid #334155; border-radius: 8px;
-      padding: 14px; font-size: 0.85rem;
+      font-size: 0.85rem; overflow: hidden;
     }
-    .order-item strong { color: #38bdf8; }
-    .order-item .meta { color: #64748b; font-size: 0.78rem; margin-top: 4px; }
+    .order-header {
+      padding: 14px; cursor: pointer; display: flex; justify-content: space-between;
+      align-items: center; transition: background 0.2s;
+    }
+    .order-header:hover { background: #1e3a4a; }
+    .order-header .left strong { color: #38bdf8; }
+    .order-header .meta { color: #64748b; font-size: 0.78rem; margin-top: 3px; }
+    .order-header .chevron { color: #64748b; font-size: 0.75rem; transition: transform 0.2s; }
+    .order-header.open .chevron { transform: rotate(180deg); }
+    .order-items-list {
+      display: none; border-top: 1px solid #334155; padding: 10px 14px;
+      background: #0a1120;
+    }
+    .order-items-list.open { display: block; }
+    .sub-item {
+      display: flex; gap: 16px; padding: 6px 0;
+      border-bottom: 1px solid #1e293b; font-size: 0.8rem; color: #94a3b8;
+    }
+    .sub-item:last-child { border-bottom: none; }
+    .sub-item span { color: #e2e8f0; }
 
     .hidden { display: none; }
     .row { display: flex; gap: 12px; }
@@ -329,16 +347,39 @@
     res.data.forEach(o => {
       const div = document.createElement('div');
       div.className = 'order-item';
+      const headerId = 'h-' + o.id;
+      const listId = 'il-' + o.id;
       div.innerHTML = `
-        <strong>${o.orderId}</strong> — R$ ${o.value?.toLocaleString('pt-BR')}
-        <div class="meta">
-          ${o.items?.length || 0} item(s) &nbsp;|&nbsp;
-          ${o.creationDate ? new Date(o.creationDate).toLocaleString('pt-BR') : '—'}
+        <div class="order-header" id="${headerId}" onclick="toggleItems('${headerId}','${listId}')">
+          <div class="left">
+            <strong>${o.orderId}</strong> — R$ ${o.value?.toLocaleString('pt-BR')}
+            <div class="meta">
+              ${o.items?.length || 0} item(s) &nbsp;|&nbsp;
+              ${o.creationDate ? new Date(o.creationDate).toLocaleString('pt-BR') : '—'}
+            </div>
+          </div>
+          <span class="chevron">▼</span>
+        </div>
+        <div class="order-items-list" id="${listId}">
+          ${(o.items || []).map(it => `
+            <div class="sub-item">
+              <span>🔖 Produto: <span>${it.productId}</span></span>
+              <span>📦 Qtd: <span>${it.quantity}</span></span>
+              <span>💰 Preço: <span>R$ ${it.price?.toLocaleString('pt-BR')}</span></span>
+            </div>
+          `).join('')}
         </div>
       `;
       listEl.appendChild(div);
     });
     listCard.classList.remove('hidden');
+  }
+
+  function toggleItems(headerId, listId) {
+    const header = document.getElementById(headerId);
+    const list = document.getElementById(listId);
+    header.classList.toggle('open');
+    list.classList.toggle('open');
   }
 
   // Init with one item row

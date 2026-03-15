@@ -125,9 +125,30 @@
       margin-bottom: 14px; transition: all 0.2s;
     }
     .btn-add:hover { border-color: #38bdf8; }
+
+    /* LOADING SCREEN */
+    #loading-screen {
+      position: fixed; inset: 0; background: #0f172a;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      z-index: 999; gap: 16px;
+    }
+    #loading-screen.hidden { display: none; }
+    #loading-screen .emoji { font-size: 2.5rem; animation: pulse 1.5s infinite; }
+    #loading-screen p { color: #94a3b8; font-size: 1rem; text-align: center; line-height: 1.8; }
+    #loading-screen .timer { font-size: 2.5rem; font-weight: 700; color: #38bdf8; }
+    #loading-screen .sub { font-size: 0.78rem; color: #475569; margin-top: 4px; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
   </style>
 </head>
 <body>
+
+<!-- LOADING SCREEN -->
+<div id="loading-screen">
+  <div class="emoji">📦</div>
+  <p>Por favor aguarde,<br>sem money então API demora:</p>
+  <div class="timer" id="countdown">30s</div>
+  <div class="sub">Acordando o servidor gratuito...</div>
+</div>
 
 <nav>
   <span class="brand">📦 Order Manager</span>
@@ -242,6 +263,22 @@
 <script>
   const API = 'https://api-w127.onrender.com';
   let currentOp = 'create';
+
+  // Wake up API and show loading screen
+  let seconds = 30;
+  const countdown = document.getElementById('countdown');
+  const loadingScreen = document.getElementById('loading-screen');
+
+  const timer = setInterval(() => {
+    seconds--;
+    countdown.textContent = seconds + 's';
+    if (seconds <= 0) { countdown.textContent = '...'; clearInterval(timer); }
+  }, 1000);
+
+  fetch(API + '/order/list').finally(() => {
+    clearInterval(timer);
+    loadingScreen.classList.add('hidden');
+  });
 
   const forms = ['create','get','update','delete','list'];
 

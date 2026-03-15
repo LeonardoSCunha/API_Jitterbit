@@ -132,4 +132,5 @@ api_pedido.delete('/order/:numeroPedido', async(request, response) => {
     }
 })
 
-api_pedido.listen(3000)
+const PORT = process.env.PORT || 3000
+api_pedido.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`))

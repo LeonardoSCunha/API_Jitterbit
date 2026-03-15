@@ -5,7 +5,9 @@ const prisma = new PrismaClient()
 const api_pedido = express()
 api_pedido.use(express.json())
 api_pedido.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*')
+  const allowed = ['https://69b6cc15f87b4882ca55ef70--api-leonardocunha.netlify.app', 'http://localhost:3000']
+  const origin = req.headers.origin
+  if (allowed.includes(origin)) res.header('Access-Control-Allow-Origin', origin)
   res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS')
   res.header('Access-Control-Allow-Headers', 'Content-Type')
   if (req.method === 'OPTIONS') return res.sendStatus(204)
